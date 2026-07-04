@@ -1,0 +1,9 @@
+{
+  "name": "linkedin-final-auto-report",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Safe public LinkedIn profile checker with auto report and manual verify queue for Vercel.",
+  "scripts": {
+    "start": "vercel dev"
+  }
+}

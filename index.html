@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LinkedIn Safe Auto Report Checker</title>
+  <style>
+    :root{
+      --bg:#08111f;--card:#111c2e;--card2:#0f1a2a;--line:#253650;--text:#ecf5ff;--muted:#9eb1cc;
+      --ok:#21c17a;--maybe:#f7c948;--bad:#ff5d6c;--unknown:#8da2bd;--blue:#4aa3ff;--white:#fff;
+      --shadow:0 20px 60px rgba(0,0,0,.35);--radius:22px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at top left,#12335b 0,#08111f 36%,#050914 100%);color:var(--text)}
+    .wrap{max-width:1220px;margin:0 auto;padding:28px 16px 60px}.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:stretch;margin-bottom:18px}.panel{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow);border-radius:var(--radius);padding:22px}.title{font-size:clamp(28px,4vw,48px);line-height:1.05;margin:0 0 12px;font-weight:900;letter-spacing:-.04em}.sub{color:var(--muted);font-size:16px;line-height:1.6;margin:0}.badge{display:inline-flex;gap:8px;align-items:center;background:rgba(74,163,255,.14);color:#bde0ff;border:1px solid rgba(74,163,255,.3);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:14px}.warning{background:rgba(247,201,72,.1);border:1px solid rgba(247,201,72,.25);border-radius:16px;padding:14px;color:#ffe6a1;line-height:1.55;font-size:14px}.grid{display:grid;gap:14px}.grid.cols4{grid-template-columns:repeat(4,1fr)}.stat{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:16px}.stat b{display:block;font-size:28px;margin-top:4px}.stat span{font-size:13px;color:var(--muted)}.ok b{color:var(--ok)}.bad b{color:var(--bad)}.maybe b{color:var(--maybe)}.unknown b{color:var(--unknown)}
+    textarea,input,select{width:100%;border:1px solid var(--line);background:#081525;color:var(--text);border-radius:16px;padding:14px 15px;font:inherit;outline:none}textarea{min-height:180px;resize:vertical;line-height:1.5}label{display:block;margin:0 0 8px;color:#c7d6ea;font-weight:800;font-size:14px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:0 0 auto}.settings{display:grid;grid-template-columns:1fr 160px 160px;gap:12px;margin-top:12px}.btn{border:0;border-radius:14px;background:#1c2c44;color:var(--white);padding:12px 16px;font-weight:900;cursor:pointer;transition:.15s;box-shadow:0 10px 25px rgba(0,0,0,.16)}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:linear-gradient(135deg,#0bbd7e,#1687ff)}.danger{background:#b91c32}.good{background:#14885b}.yellow{background:#a97905}.ghost{background:transparent;border:1px solid var(--line)}.small{padding:8px 10px;border-radius:10px;font-size:13px}.progress{height:12px;background:#071120;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:14px}.bar{height:100%;width:0;background:linear-gradient(90deg,#16c784,#4aa3ff);transition:.25s}.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--line);background:rgba(0,0,0,.15)}table{border-collapse:collapse;width:100%;min-width:980px}th,td{padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#0b1728;color:#c7d6ea;font-size:13px;z-index:1}td{font-size:14px;color:#e8f2ff}.url{max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid transparent}.pill.ok{background:rgba(33,193,122,.12);color:#7dffc1;border-color:rgba(33,193,122,.22)}.pill.bad{background:rgba(255,93,108,.12);color:#ffacb5;border-color:rgba(255,93,108,.24)}.pill.unknown{background:rgba(141,162,189,.12);color:#c7d2e1;border-color:rgba(141,162,189,.22)}.pill.maybe{background:rgba(247,201,72,.12);color:#ffe390;border-color:rgba(247,201,72,.22)}.pill.invalid{background:rgba(255,255,255,.08);color:#ddd}.reason{color:var(--muted);max-width:360px;line-height:1.35}.footer-note{color:var(--muted);font-size:13px;line-height:1.5;margin-top:14px}.queue{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}.current{border:1px dashed rgba(74,163,255,.45);background:rgba(74,163,255,.08);border-radius:18px;padding:16px}.current a{color:#8bc8ff;word-break:break-all}.kbd{display:inline-block;border:1px solid #455b7b;background:#0b1728;border-bottom-width:3px;border-radius:8px;padding:3px 8px;font-weight:900;color:#eaf5ff;margin:2px}.hide{display:none!important}.search{margin:14px 0;display:grid;grid-template-columns:1fr 160px 150px;gap:10px}.toast{position:fixed;right:16px;bottom:16px;background:#0c1a2d;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);max-width:360px;display:none;z-index:99}.toast.show{display:block}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.manualTag{color:#bde0ff;font-size:12px;margin-left:6px}
+    @media(max-width:900px){.hero,.queue,.split{grid-template-columns:1fr}.grid.cols4{grid-template-columns:repeat(2,1fr)}.settings,.search{grid-template-columns:1fr}.row>*{flex:1 1 auto}.btn{width:100%}.tools .btn{width:auto}.panel{padding:17px}.wrap{padding:16px 10px 40px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <section class="panel">
+        <div class="badge">✅ Safe Public Auto + Fast Manual Report</div>
+        <h1 class="title">LinkedIn Profile Checker</h1>
+        <p class="sub">Bulk link paste করুন। আগে auto-check হবে। যেগুলো LinkedIn block করবে সেগুলো Unknown queue-তে যাবে—তারপর keyboard shortcut দিয়ে দ্রুত final confirm করবেন।</p>
+      </section>
+      <section class="panel">
+        <div class="warning"><b>Important:</b> এই tool password/token/cookie/login নেয় না। LinkedIn automated request block করলে Unknown আসতে পারে। তাই final report-এ <b>Auto Result + Manual Confirmed</b> দুটোই থাকবে।</div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <label for="urls">LinkedIn profile links paste করুন — প্রতি লাইনে ১টি</label>
+      <textarea id="urls" placeholder="https://www.linkedin.com/in/example-1/&#10;https://www.linkedin.com/in/example-2/"></textarea>
+      <div class="settings">
+        <div>
+          <label for="apiUrl">API URL</label>
+          <input id="apiUrl" value="/api/check" />
+        </div>
+        <div>
+          <label for="delay">Delay</label>
+          <select id="delay"><option value="900">Fast 0.9s</option><option value="1800" selected>Balanced 1.8s</option><option value="3500">Slow 3.5s</option><option value="6000">Very Slow 6s</option></select>
+        </div>
+        <div>
+          <label for="chunk">Batch</label>
+          <select id="chunk"><option value="1" selected>Best: 1 by 1</option><option value="2">2 links/request</option><option value="3">3 links/request</option><option value="5">5 links/request</option></select>
+        </div>
+      </div>
+      <div class="tools">
+        <button class="btn primary" id="prepareBtn">Prepare List</button>
+        <button class="btn good" id="startBtn">Submit & Auto Check</button>
+        <button class="btn danger" id="stopBtn" disabled>Stop</button>
+        <button class="btn yellow" id="retryBtn">Retry Unknown / Likely</button>
+        <button class="btn ghost" id="clearBtn">Clear</button>
+      </div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="footer-note" id="progressText">Ready.</div>
+    </section>
+
+    <section class="grid cols4" style="margin:16px 0">
+      <div class="stat"><span>Total ID</span><b id="sTotal">0</b></div>
+      <div class="stat ok"><span>Confirmed OK</span><b id="sOk">0</b></div>
+      <div class="stat bad"><span>Confirmed Not OK</span><b id="sBad">0</b></div>
+      <div class="stat unknown"><span>Manual Needed</span><b id="sUnknown">0</b></div>
+    </section>
+    <section class="grid cols4" style="margin:0 0 16px">
+      <div class="stat maybe"><span>Likely OK</span><b id="sMaybe">0</b></div>
+      <div class="stat"><span>Invalid Link</span><b id="sInvalid">0</b></div>
+      <div class="stat"><span>Checked</span><b id="sChecked">0</b></div>
+      <div class="stat"><span>Progress</span><b id="sProgress">0%</b></div>
+    </section>
+
+    <section class="queue">
+      <div class="panel current">
+        <label>Manual Verify Current</label>
+        <div id="currentBox" class="reason">Unknown/Likely result এলে এখানে current profile দেখাবে।</div>
+        <div class="tools">
+          <button class="btn primary" id="openCurrent">O Open</button>
+          <button class="btn good" id="markOk">1 OK</button>
+          <button class="btn danger" id="markBad">2 Not OK</button>
+          <button class="btn ghost" id="skipCurrent">3 Skip</button>
+          <button class="btn ghost" id="nextCurrent">N Next</button>
+        </div>
+        <div class="footer-note">Shortcut: <span class="kbd">O</span> open, <span class="kbd">1</span> OK, <span class="kbd">2</span> Not OK, <span class="kbd">3</span> Skip, <span class="kbd">N</span> Next</div>
+      </div>
+      <div class="panel">
+        <label>Quick Actions</label>
+        <div class="split">
+          <button class="btn yellow" id="open3">Open 3 Manual Needed</button>
+          <button class="btn yellow" id="open5">Open 5 Manual Needed</button>
+          <button class="btn ghost" id="exportCsv">Export CSV</button>
+          <button class="btn ghost" id="copyReport">Copy Summary</button>
+        </div>
+        <p class="footer-note">Manual mark করলে report update হবে এবং browser localStorage-এ progress save থাকবে।</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="search">
+        <input id="filterText" placeholder="Search URL / reason..." />
+        <select id="filterStatus"><option value="all">All status</option><option value="ok">OK</option><option value="likely_ok">Likely OK</option><option value="not_ok">Not OK</option><option value="unknown">Unknown</option><option value="invalid">Invalid</option><option value="manual_ok">Manual OK</option><option value="manual_bad">Manual Not OK</option></select>
+        <button class="btn ghost" id="applyFilter">Filter</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Profile URL</th><th>Status</th><th>Confidence</th><th>Reason</th><th>HTTP</th><th>Actions</th></tr></thead>
+          <tbody id="tbody"><tr><td colspan="7" class="reason">No links prepared yet.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const state = { items: [], running:false, stopped:false, currentManualIndex:-1, filterText:'', filterStatus:'all' };
+const LS_KEY = 'linkedin_safe_auto_report_v2';
+
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function normalizeUrl(raw){
+  try{
+    let s = String(raw||'').trim(); if(!s) return null;
+    if(!/^https?:\/\//i.test(s)) s='https://'+s;
+    const u = new URL(s); const host = u.hostname.toLowerCase().replace(/^www\./,'');
+    if(host !== 'linkedin.com') return { raw, valid:false, normalized:null, reason:'Only linkedin.com allowed' };
+    const path = u.pathname.replace(/\/+/g,'/');
+    if(!(/^\/in\/[^/?#]+\/?$/i.test(path) || /^\/pub\/[^?#]+/i.test(path))) return { raw, valid:false, normalized:null, reason:'Only /in/ or /pub/ profile URL' };
+    u.protocol='https:'; u.hostname='www.linkedin.com'; u.search=''; u.hash='';
+    return { raw, valid:true, normalized:u.toString().replace(/\/$/,'/')+'/', reason:'' };
+  }catch(e){ return { raw, valid:false, normalized:null, reason:'Invalid URL' }; }
+}
+function parseInput(){
+  const lines = $('urls').value.split(/\n|,|\t/).map(x=>x.trim()).filter(Boolean);
+  const seen = new Set(); const out=[];
+  for(const line of lines){
+    const n = normalizeUrl(line);
+    if(!n) continue;
+    const key = n.valid ? n.normalized.toLowerCase() : 'invalid:'+line;
+    if(seen.has(key)) continue; seen.add(key);
+    out.push({ id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2), input:line, url:n.normalized, status:n.valid?'pending':'invalid', confidence:n.valid?0:100, reason:n.reason, httpStatus:'', checkedAt:'', manual:null, finalStatus:n.valid?'pending':'invalid', needsManual:!n.valid?false:false });
+  }
+  return out;
+}
+function prepare(){ state.items = parseInput(); state.currentManualIndex=-1; save(); render(); toast(`${state.items.length} links prepared`); }
+function finalStatus(item){ return item.manual || item.status; }
+function counts(){
+  const c={total:state.items.length, ok:0,bad:0,unknown:0,maybe:0,invalid:0,checked:0,pending:0};
+  for(const it of state.items){
+    const fs=finalStatus(it);
+    if(fs==='manual_ok' || fs==='ok') c.ok++;
+    else if(fs==='manual_bad' || fs==='not_ok') c.bad++;
+    else if(fs==='likely_ok') { c.maybe++; c.unknown++; }
+    else if(fs==='unknown') c.unknown++;
+    else if(fs==='invalid') c.invalid++;
+    else if(fs==='pending') c.pending++;
+    if(fs!=='pending') c.checked++;
+  }
+  return c;
+}
+function updateStats(){
+  const c=counts(); $('sTotal').textContent=c.total; $('sOk').textContent=c.ok; $('sBad').textContent=c.bad; $('sUnknown').textContent=c.unknown; $('sMaybe').textContent=c.maybe; $('sInvalid').textContent=c.invalid; $('sChecked').textContent=c.checked;
+  const pct=c.total?Math.round((c.checked/c.total)*100):0; $('sProgress').textContent=pct+'%'; $('bar').style.width=pct+'%';
+}
+function pill(status, manual){
+  const map={ok:['ok','OK / Active Public'], likely_ok:['maybe','Likely OK'], not_ok:['bad','Not OK / Possibly Ban'], unknown:['unknown','Unknown / Manual Needed'], invalid:['invalid','Invalid'], pending:['unknown','Pending'], manual_ok:['ok','Manual OK'], manual_bad:['bad','Manual Not OK']};
+  const m=map[status]||map.unknown; return `<span class="pill ${m[0]}">${m[1]}</span>${manual?'<span class="manualTag">manual</span>':''}`;
+}
+function filteredItems(){
+  let arr=state.items.map((it,idx)=>({it,idx})); const q=state.filterText.toLowerCase(); const st=state.filterStatus;
+  if(q) arr=arr.filter(x=>(x.it.url||x.it.input||'').toLowerCase().includes(q) || (x.it.reason||'').toLowerCase().includes(q));
+  if(st!=='all') arr=arr.filter(x=>finalStatus(x.it)===st);
+  return arr;
+}
+function renderTable(){
+  const tb=$('tbody'); const arr=filteredItems();
+  if(!arr.length){ tb.innerHTML='<tr><td colspan="7" class="reason">No result found.</td></tr>'; return; }
+  tb.innerHTML = arr.map(({it,idx})=>{
+    const fs=finalStatus(it); const conf = (it.confidence||0) ? `${it.confidence}%` : '-';
+    const u = it.url || it.input;
+    return `<tr>
+      <td>${idx+1}</td><td class="url" title="${escapeHtml(u)}"><a href="${escapeAttr(u)}" target="_blank" rel="noopener" style="color:#8bc8ff">${escapeHtml(u)}</a></td>
+      <td>${pill(fs, !!it.manual)}</td><td>${conf}</td><td class="reason">${escapeHtml(it.reason||'')}</td><td>${escapeHtml(String(it.httpStatus||''))}</td>
+      <td><button class="btn small ghost" onclick="openIdx(${idx})">Open</button> <button class="btn small good" onclick="mark(${idx},'manual_ok')">OK</button> <button class="btn small danger" onclick="mark(${idx},'manual_bad')">Not OK</button></td>
+    </tr>`;
+  }).join('');
+}
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function escapeAttr(s){return escapeHtml(s).replace(/`/g,'&#96;');}
+function renderCurrent(){
+  const idx = getManualIndexes()[0]; state.currentManualIndex = idx ?? -1;
+  if(idx === undefined){ $('currentBox').innerHTML='Manual needed profile নেই।'; return; }
+  const it=state.items[idx]; $('currentBox').innerHTML = `<b>#${idx+1}</b><br><a href="${escapeAttr(it.url)}" target="_blank" rel="noopener">${escapeHtml(it.url)}</a><br><br><span class="reason">${escapeHtml(it.reason||'')}</span>`;
+}
+function render(){ updateStats(); renderCurrent(); renderTable(); save(); }
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify({items:state.items, api:$('apiUrl')?.value, delay:$('delay')?.value, chunk:$('chunk')?.value})); }
+function load(){
+  try{ const data=JSON.parse(localStorage.getItem(LS_KEY)||'{}'); if(Array.isArray(data.items)) state.items=data.items; if(data.api) $('apiUrl').value=data.api; if(data.delay) $('delay').value=data.delay; if(data.chunk) $('chunk').value=data.chunk; }catch(e){}
+}
+async function callApi(urls){
+  const api=$('apiUrl').value.trim()||'/api/check';
+  const res=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({urls})});
+  const data=await res.json().catch(()=>null); if(!res.ok || !data || !data.ok) throw new Error((data&&data.error)||'API failed');
+  return data.results || [];
+}
+async function startAuto(onlyUnknown=false){
+  if(!state.items.length) prepare(); if(!state.items.length) return toast('No URL found');
+  state.running=true; state.stopped=false; $('startBtn').disabled=true; $('stopBtn').disabled=false; $('retryBtn').disabled=true;
+  const delay=Number($('delay').value||1800); const chunkSize=Number($('chunk').value||1);
+  const indexes = state.items.map((it,i)=>({it,i})).filter(x=> x.it.url && (onlyUnknown ? ['unknown','likely_ok','pending'].includes(x.it.status) && !x.it.manual : x.it.status==='pending')).map(x=>x.i);
+  if(!indexes.length){ toast('Nothing to check'); state.running=false; $('startBtn').disabled=false; $('stopBtn').disabled=true; $('retryBtn').disabled=false; return; }
+  for(let p=0; p<indexes.length; p+=chunkSize){
+    if(state.stopped) break;
+    const batchIdx=indexes.slice(p,p+chunkSize); const urls=batchIdx.map(i=>state.items[i].url);
+    $('progressText').textContent=`Checking ${p+1}-${Math.min(p+chunkSize,indexes.length)} of ${indexes.length}...`;
+    try{
+      const results=await callApi(urls);
+      for(const r of results){
+        const idx=batchIdx.find(i=> state.items[i].url === r.normalizedUrl || state.items[i].input === r.input);
+        if(idx !== undefined){ Object.assign(state.items[idx], {status:r.status, confidence:r.confidence, reason:r.reason, httpStatus:r.httpStatus || '', checkedAt:r.checkedAt, finalUrl:r.finalUrl, needsManual:r.needsManual}); }
+      }
+    }catch(e){
+      for(const i of batchIdx){ Object.assign(state.items[i], {status:'unknown', confidence:0, reason:'API/Vercel request failed: '+e.message, needsManual:true, checkedAt:new Date().toISOString()}); }
+    }
+    render(); await sleep(delay);
+  }
+  state.running=false; $('startBtn').disabled=false; $('stopBtn').disabled=true; $('retryBtn').disabled=false; $('progressText').textContent=state.stopped?'Stopped.':'Auto check completed. Manual queue ready.'; render(); toast('Auto check completed');
+}
+function getManualIndexes(){ return state.items.map((it,i)=>({it,i})).filter(x=>!x.it.manual && ['unknown','likely_ok'].includes(x.it.status)).map(x=>x.i); }
+window.openIdx=function(idx){ const it=state.items[idx]; if(it && it.url) window.open(it.url,'_blank','noopener'); }
+window.mark=function(idx,status){ const it=state.items[idx]; if(!it) return; it.manual=status; it.reason = (it.reason||'') + (status==='manual_ok'?' | Manually confirmed OK':' | Manually confirmed Not OK'); render(); }
+function markCurrent(status){ const idx=state.currentManualIndex; if(idx<0) return toast('No manual item'); mark(idx,status); }
+function openCurrent(){ const idx=state.currentManualIndex; if(idx<0) return toast('No manual item'); openIdx(idx); }
+function skipCurrent(){ const idx=state.currentManualIndex; if(idx<0) return; state.items[idx].manual='skipped'; state.items[idx].status='unknown'; state.items[idx].reason=(state.items[idx].reason||'')+' | Skipped'; render(); }
+function nextCurrent(){ const idx=state.currentManualIndex; if(idx<0) return; const item=state.items.splice(idx,1)[0]; state.items.push(item); render(); }
+function openBatch(n){ const ids=getManualIndexes().slice(0,n); if(!ids.length) return toast('No manual needed'); ids.forEach((idx,k)=>setTimeout(()=>openIdx(idx), k*250)); }
+function exportCsv(){
+  const headers=['no','input','url','final_status','auto_status','manual','confidence','http_status','reason','checked_at'];
+  const rows=state.items.map((it,i)=>[i+1,it.input,it.url||'',finalStatus(it),it.status,it.manual||'',it.confidence||'',it.httpStatus||'',it.reason||'',it.checkedAt||'']);
+  const csv=[headers,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='linkedin-check-report.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+function copyReport(){ const c=counts(); const msg=`LinkedIn Check Report\nTotal: ${c.total}\nConfirmed OK: ${c.ok}\nConfirmed Not OK: ${c.bad}\nLikely OK: ${c.maybe}\nManual Needed/Unknown: ${c.unknown}\nInvalid: ${c.invalid}`; navigator.clipboard.writeText(msg).then(()=>toast('Summary copied')); }
+function clearAll(){ if(confirm('Clear all data?')){ state.items=[]; $('urls').value=''; localStorage.removeItem(LS_KEY); render(); } }
+$('prepareBtn').onclick=prepare; $('startBtn').onclick=()=>startAuto(false); $('retryBtn').onclick=()=>startAuto(true); $('stopBtn').onclick=()=>{state.stopped=true;}; $('clearBtn').onclick=clearAll; $('openCurrent').onclick=openCurrent; $('markOk').onclick=()=>markCurrent('manual_ok'); $('markBad').onclick=()=>markCurrent('manual_bad'); $('skipCurrent').onclick=skipCurrent; $('nextCurrent').onclick=nextCurrent; $('open3').onclick=()=>openBatch(3); $('open5').onclick=()=>openBatch(5); $('exportCsv').onclick=exportCsv; $('copyReport').onclick=copyReport; $('applyFilter').onclick=()=>{state.filterText=$('filterText').value.trim(); state.filterStatus=$('filterStatus').value; renderTable();};
+$('filterText').addEventListener('input',()=>{state.filterText=$('filterText').value.trim(); renderTable();}); $('filterStatus').addEventListener('change',()=>{state.filterStatus=$('filterStatus').value; renderTable();});
+document.addEventListener('keydown',(e)=>{ if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return; const k=e.key.toLowerCase(); if(k==='o') openCurrent(); if(k==='1') markCurrent('manual_ok'); if(k==='2') markCurrent('manual_bad'); if(k==='3') skipCurrent(); if(k==='n') nextCurrent(); });
+load(); render();
+</script>
+</body>
+</html>
