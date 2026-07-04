@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedIn Public Profile Auto Checker</title>
+  <meta name="description" content="Safe LinkedIn public profile accessibility checker. No login, password, token, or cookie required." />
+  <style>
+    :root {
+      --bg: #071725;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --border: rgba(255,255,255,.14);
+      --text: #f2f8ff;
+      --muted: #a8c1d8;
+      --green: #42e6b0;
+      --blue: #6bbdff;
+      --red: #ff6e91;
+      --yellow: #ffd166;
+      --shadow: 0 24px 70px rgba(0,0,0,.32);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, Segoe UI, system-ui, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(66,230,176,.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(107,189,255,.16), transparent 32%),
+        linear-gradient(135deg, #06111e 0%, #081a2a 55%, #04101c 100%);
+    }
+
+    .wrap { width: min(1160px, calc(100% - 28px)); margin: 0 auto; padding: 34px 0 48px; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.06));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .intro { padding: 28px; position: relative; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid rgba(66,230,176,.32);
+      background: rgba(66,230,176,.11);
+      color: #b7ffe8;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: clamp(30px, 4vw, 52px); line-height: 1.02; letter-spacing: -1.4px; }
+    .lead { margin: 16px 0 0; color: var(--muted); line-height: 1.72; font-size: 16px; }
+    .warn { margin-top: 18px; padding: 14px 15px; border-radius: 16px; border: 1px solid rgba(255,209,102,.28); background: rgba(255,209,102,.08); color: #ffe5a6; line-height: 1.55; font-size: 14px; }
+
+    .statsGrid { padding: 18px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .stat {
+      background: rgba(5,18,31,.58);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .stat .num { font-size: 38px; font-weight: 900; letter-spacing: -1px; }
+    .stat .txt { color: var(--muted); font-weight: 700; font-size: 14px; }
+    .stat.ok .num { color: var(--green); }
+    .stat.bad .num { color: var(--red); }
+    .stat.unknown .num { color: var(--yellow); }
+    .stat.invalid .num { color: var(--blue); }
+
+    .section { padding: 22px; margin-top: 20px; }
+    .sectionHead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 14px; }
+    .section h2 { margin: 0; font-size: 22px; }
+    .hint { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    textarea {
+      width: 100%; min-height: 230px; resize: vertical;
+      border-radius: 18px; border: 1px solid var(--border);
+      background: rgba(1,12,22,.72); color: white;
+      outline: none; padding: 18px; font-size: 15px; line-height: 1.65;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    textarea:focus { border-color: rgba(107,189,255,.55); box-shadow: 0 0 0 4px rgba(107,189,255,.12); }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; align-items: center; }
+    button, .btnLink {
+      border: 0; cursor: pointer; color: #03131f; background: var(--green); font-weight: 800;
+      padding: 13px 17px; border-radius: 14px; font-size: 15px; text-decoration: none;
+      transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    button:hover, .btnLink:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0,0,0,.18); }
+    button:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .secondary { background: rgba(255,255,255,.12); color: white; border: 1px solid var(--border); }
+    .blue { background: var(--blue); color: #03131f; }
+    .red { background: rgba(255,110,145,.14); color: #ffd6df; border: 1px solid rgba(255,110,145,.35); }
+    .smallBtn { padding: 9px 12px; border-radius: 12px; font-size: 13px; }
+
+    .statusLine { color: var(--muted); margin-left: auto; font-size: 14px; }
+    .loader { display: none; width: 18px; height: 18px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: #03131f; animation: spin .8s linear infinite; }
+    .loading .loader { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tableWrap { overflow-x: auto; border-radius: 18px; border: 1px solid var(--border); background: rgba(2,12,22,.45); }
+    table { width: 100%; border-collapse: collapse; min-width: 920px; }
+    th, td { padding: 14px 13px; border-bottom: 1px solid rgba(255,255,255,.09); text-align: left; vertical-align: top; }
+    th { color: #9ed1ff; text-transform: uppercase; font-size: 12px; letter-spacing: .8px; background: rgba(255,255,255,.05); }
+    tr:last-child td { border-bottom: 0; }
+    .urlCell { color: #dcefff; word-break: break-all; font-weight: 700; }
+    .pill { display: inline-flex; align-items: center; justify-content: center; min-width: 78px; border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 900; }
+    .pill.ok { background: rgba(66,230,176,.16); color: #aaffdf; border: 1px solid rgba(66,230,176,.35); }
+    .pill.not_ok { background: rgba(255,110,145,.16); color: #ffd1dc; border: 1px solid rgba(255,110,145,.36); }
+    .pill.unknown { background: rgba(255,209,102,.15); color: #ffe29a; border: 1px solid rgba(255,209,102,.35); }
+    .pill.invalid { background: rgba(107,189,255,.15); color: #cdeaff; border: 1px solid rgba(107,189,255,.35); }
+    .msg { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .empty { padding: 24px; color: var(--muted); text-align: center; }
+    .footer { color: var(--muted); text-align: center; font-size: 13px; margin-top: 22px; line-height: 1.6; }
+    code { background: rgba(255,255,255,.09); padding: 3px 7px; border-radius: 8px; color: #cdeaff; }
+
+    @media (max-width: 840px) {
+      .hero { grid-template-columns: 1fr; }
+      .statsGrid { grid-template-columns: repeat(2, 1fr); }
+      .sectionHead { display: block; }
+      .statusLine { width: 100%; margin-left: 0; }
+      button, .btnLink { width: 100%; }
+    }
+    @media (max-width: 520px) {
+      .wrap { width: min(100% - 18px, 1160px); padding-top: 16px; }
+      .intro, .section { padding: 18px; }
+      .statsGrid { grid-template-columns: 1fr; }
+      textarea { min-height: 210px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="panel intro">
+        <div class="badge">Safe Public Checker</div>
+        <h1>LinkedIn Profile Auto Checker</h1>
+        <p class="lead">প্রোফাইল লিংক paste করে submit দিলে server-side API দিয়ে public accessibility check করবে। Password, email, token, cookie বা login লাগবে না।</p>
+        <div class="warn">Note: <b>Not OK</b> মানে banned 100% নিশ্চিত না। Profile removed/private/not found হলেও Not OK আসতে পারে। LinkedIn request block করলে <b>Unknown</b> দেখাবে।</div>
+      </div>
+      <div class="panel statsGrid">
+        <div class="stat"><div class="num" id="totalCount">0</div><div class="txt">Total ID</div></div>
+        <div class="stat ok"><div class="num" id="okCount">0</div><div class="txt">OK / Active Public</div></div>
+        <div class="stat bad"><div class="num" id="badCount">0</div><div class="txt">Not OK / Possibly Ban</div></div>
+        <div class="stat unknown"><div class="num" id="unknownCount">0</div><div class="txt">Unknown / Blocked</div></div>
+      </div>
+    </section>
+
+    <section class="panel section">
+      <div class="sectionHead">
+        <div>
+          <h2>Paste Profile Links</h2>
+          <p class="hint">প্রতি লাইনে ১টি করে LinkedIn profile URL দিন। Allowed: <code>linkedin.com/in/...</code> বা <code>linkedin.com/pub/...</code></p>
+        </div>
+        <button class="secondary smallBtn" id="sampleBtn" type="button">Sample</button>
+      </div>
+      <textarea id="inputLinks" placeholder="https://www.linkedin.com/in/example-123456/"></textarea>
+      <div class="actions" id="actionBar">
+        <button id="checkBtn" type="button"><span class="loader"></span><span>Submit & Auto Check</span></button>
+        <button id="openAllBtn" class="blue" type="button">Open All Valid</button>
+        <button id="exportBtn" class="secondary" type="button">Export CSV</button>
+        <button id="clearBtn" class="red" type="button">Clear</button>
+        <span class="statusLine" id="statusLine">Ready</span>
+      </div>
+    </section>
+
+    <section class="panel section">
+      <div class="sectionHead">
+        <div>
+          <h2>Result</h2>
+          <p class="hint">Submit দিলে এখানে Total, OK, Not OK/Possibly Ban, Unknown সব দেখাবে।</p>
+        </div>
+      </div>
+      <div class="tableWrap" id="resultWrap">
+        <div class="empty">এখনও কোনো result নেই। Profile link paste করে Submit & Auto Check চাপুন।</div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Vercel hosting এর জন্য ready. GitHub-এ push করে Vercel import করলেই API route <code>/api/check</code> কাজ করবে।
+    </div>
+  </main>
+
+  <script>
+    const inputLinks = document.getElementById('inputLinks');
+    const checkBtn = document.getElementById('checkBtn');
+    const openAllBtn = document.getElementById('openAllBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const statusLine = document.getElementById('statusLine');
+    const resultWrap = document.getElementById('resultWrap');
+    const actionBar = document.getElementById('actionBar');
+
+    let lastResults = [];
+
+    function parseLinks() {
+      return inputLinks.value
+        .split(/\n+/)
+        .map(x => x.trim())
+        .filter(Boolean)
+        .filter((v, i, arr) => arr.indexOf(v) === i);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/[&<>'"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function updateCounts(summary = {}) {
+      document.getElementById('totalCount').textContent = summary.total || 0;
+      document.getElementById('okCount').textContent = summary.ok || 0;
+      document.getElementById('badCount').textContent = summary.not_ok || 0;
+      document.getElementById('unknownCount').textContent = (summary.unknown || 0) + (summary.invalid || 0);
+    }
+
+    function setLoading(isLoading) {
+      checkBtn.disabled = isLoading;
+      actionBar.classList.toggle('loading', isLoading);
+      statusLine.textContent = isLoading ? 'Checking... please wait' : 'Ready';
+    }
+
+    function statusClass(status) {
+      if (status === 'ok') return 'ok';
+      if (status === 'not_ok') return 'not_ok';
+      if (status === 'invalid') return 'invalid';
+      return 'unknown';
+    }
+
+    function renderResults(results) {
+      lastResults = Array.isArray(results) ? results : [];
+      if (!lastResults.length) {
+        resultWrap.innerHTML = '<div class="empty">No result found.</div>';
+        return;
+      }
+
+      const rows = lastResults.map((r, index) => {
+        const cls = statusClass(r.status);
+        const http = r.httpStatus ? r.httpStatus : '-';
+        const safeUrl = escapeHtml(r.url || r.input || '');
+        const link = r.url && /^https?:\/\//.test(r.url)
+          ? `<a class="btnLink secondary smallBtn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">Open</a>`
+          : '';
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td class="urlCell">${safeUrl}</td>
+            <td><span class="pill ${cls}">${escapeHtml(r.label || r.status)}</span></td>
+            <td>${http}</td>
+            <td class="msg">${escapeHtml(r.message || '')}</td>
+            <td>${link}</td>
+          </tr>
+        `;
+      }).join('');
+
+      resultWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Profile URL</th>
+              <th>Status</th>
+              <th>HTTP</th>
+              <th>Message</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    async function checkLinks() {
+      const urls = parseLinks();
+      if (!urls.length) {
+        alert('আগে LinkedIn profile link paste করুন।');
+        return;
+      }
+      if (urls.length > 25) {
+        alert('একবারে সর্বোচ্চ ২৫টি link check করা যাবে।');
+        return;
+      }
+
+      setLoading(true);
+      updateCounts({ total: urls.length, ok: 0, not_ok: 0, unknown: 0, invalid: 0 });
+      resultWrap.innerHTML = '<div class="empty">Checking links... একটু অপেক্ষা করুন।</div>';
+
+      try {
+        const res = await fetch('/api/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'API request failed');
+        updateCounts(data.summary);
+        renderResults(data.results);
+        statusLine.textContent = `Checked ${data.summary.total} link(s)`;
+      } catch (error) {
+        resultWrap.innerHTML = `<div class="empty">API error: ${escapeHtml(error.message)}<br>Vercel এ host করলে /api/check route কাজ করবে। Local file হিসেবে open করলে auto-check হবে না।</div>`;
+        statusLine.textContent = 'API error';
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function openAllValid() {
+      const urls = parseLinks().slice(0, 20);
+      if (!urls.length) return alert('আগে link দিন।');
+      if (!confirm(`${urls.length}টি profile আলাদা tab-এ open হবে। Continue?`)) return;
+      urls.forEach((u, i) => setTimeout(() => window.open(/^https?:\/\//i.test(u) ? u : 'https://' + u, '_blank', 'noopener,noreferrer'), i * 250));
+    }
+
+    function exportCsv() {
+      if (!lastResults.length) return alert('আগে check করুন।');
+      const header = ['No','Input','URL','Status','Label','HTTP Status','Message'];
+      const lines = [header, ...lastResults.map((r, i) => [
+        i + 1,
+        r.input || '',
+        r.url || '',
+        r.status || '',
+        r.label || '',
+        r.httpStatus || '',
+        r.message || ''
+      ])].map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `linkedin-profile-check-results-${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    }
+
+    sampleBtn.addEventListener('click', () => {
+      inputLinks.value = [
+        'https://www.linkedin.com/in/mow-green-7b49b241b/',
+        'https://www.linkedin.com/in/rani-adams-274033420/',
+        'https://www.linkedin.com/in/rai-mitchell-17980541b/'
+      ].join('\n');
+    });
+    checkBtn.addEventListener('click', checkLinks);
+    openAllBtn.addEventListener('click', openAllValid);
+    exportBtn.addEventListener('click', exportCsv);
+    clearBtn.addEventListener('click', () => {
+      inputLinks.value = '';
+      lastResults = [];
+      updateCounts({ total: 0, ok: 0, not_ok: 0, unknown: 0, invalid: 0 });
+      resultWrap.innerHTML = '<div class="empty">এখনও কোনো result নেই। Profile link paste করে Submit & Auto Check চাপুন।</div>';
+      statusLine.textContent = 'Ready';
+    });
+  </script>
+</body>
+</html>
