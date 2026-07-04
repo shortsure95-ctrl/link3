@@ -1,0 +1,9 @@
+{
+  "name": "linkedin-public-profile-checker",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Vercel-ready safe public LinkedIn profile availability checker.",
+  "engines": {
+    "node": ">=18"
+  }
+}
